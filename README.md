@@ -1,6 +1,9 @@
-## lox
+## Lox
+A Lox implementation from the book [Crafting Interpreters](https://craftinginterpreters.com).
+<div style="text-align: center; max-width: 70%; margin: auto;">
 
-https://craftinginterpreters.com/
+<img src=".github/mountain.png">
+</div>
 
 ## Chapters
 - [x] 1. Introduction <sub><sup>September 7th, 2020</sup></sub>
