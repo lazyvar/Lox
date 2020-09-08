@@ -5,7 +5,7 @@ A Lox implementation from the book [Crafting Interpreters](https://craftinginter
 
 ## Chapters
 - [x] 1. Introduction <sub><sup>September 7th, 2020</sup></sub>
-- [ ] 2. A Map of the Territory
+- [x] 2. A Map of the Territory <sub><sup>September 8th, 2020</sup></sub>
 - [ ] 3. The Lox Language
 - [ ] 4. Scanning
 - [ ] 5. Representing Code
