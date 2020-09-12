@@ -1,7 +1,11 @@
 package com.hasz.lang.lox;
 
 class AstPrinter implements Expr.Visitor<String> {
-  String print(Expr expr) {
+  void print(Expr expr) {
+    System.out.println(describe(expr));
+  }
+
+  String describe(Expr expr) {
     return expr.accept(this);
   }
 

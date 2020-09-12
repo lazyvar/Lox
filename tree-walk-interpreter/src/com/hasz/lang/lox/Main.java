@@ -9,7 +9,11 @@ import java.nio.file.Paths;
 import java.util.List;
 
 public class Main {
+  private static final Interpreter interpreter = new Interpreter();
+  private static final AstPrinter printer = new AstPrinter();
+
   static boolean hadError = false;
+  static boolean hadRuntimeError = false;
 
   public static void main(String[] args) throws IOException {
     if (args.length > 1) {
@@ -29,6 +33,10 @@ public class Main {
 
     if (hadError) {
       System.exit(65);
+    }
+
+    if (hadRuntimeError) {
+      System.exit(70);
     }
   }
 
@@ -60,7 +68,8 @@ public class Main {
       return;
     }
 
-    System.out.println(new AstPrinter().print(expression));
+    printer.print(expression);
+    interpreter.interpret(expression);
   }
 
   static void error(int line, String message) {
@@ -78,5 +87,10 @@ public class Main {
   private static void report(int line, String where, String message) {
     System.err.println("[line " + line + "] Error" + where + ": " + message);
     hadError = true;
+  }
+
+  public static void runtimeError(RuntimeError error) {
+    System.err.println(error.getMessage() + "\n[line " + error.token.line + "]");
+    hadRuntimeError = true;
   }
 }

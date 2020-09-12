@@ -25,11 +25,21 @@ class Parser {
   }
 
   private Expr expression() {
-    return conditional();
+    return comma();
+  }
+
+  private Expr comma() {
+    Expr expr = conditional();
+
+    while (matchAndAdvance(COMMA)) {
+      expr = new Expr.Binary(expr, previous(), conditional());
+    }
+
+    return expr;
   }
 
   private Expr conditional() {
-    Expr equality = list();
+    Expr equality = equality();
 
     if (matchAndAdvance(QUESTION_MARK)) {
       Expr ifBranch = expression();
@@ -40,16 +50,6 @@ class Parser {
     }
 
     return equality;
-  }
-
-  private Expr list() {
-    Expr expr = equality();
-
-    while (matchAndAdvance(COMMA)) {
-      expr = new Expr.Binary(expr, previous(), equality());
-    }
-
-    return expr;
   }
 
   private Expr equality() {
