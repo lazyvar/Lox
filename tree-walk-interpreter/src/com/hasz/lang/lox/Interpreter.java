@@ -1,15 +1,62 @@
 package com.hasz.lang.lox;
 
-import com.hasz.lang.lox.Expr;
+import java.util.List;
 
-class Interpreter implements Expr.Visitor<Object> {
-  void interpret(Expr expression) {
+class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
+  private Environment currentEnvironment = new Environment();
+
+  void interpret(List<Stmt> statements) {
     try {
-      Object value = evaluate(expression);
-      System.out.println(stringify(value));
+      for (Stmt statement : statements) {
+        execute(statement);
+      }
     } catch (RuntimeError error) {
       Main.runtimeError(error);
     }
+  }
+
+  @Override
+  public Void visitBlockStmt(Stmt.Block stmt) {
+    executeBlock(stmt.statements, new Environment(currentEnvironment));
+
+    return null;
+  }
+
+  @Override
+  public Void visitExpressionStmt(Stmt.Expression stmt) {
+    evaluate(stmt.expression);
+
+    return null;
+  }
+
+  @Override
+  public Void visitPrintStmt(Stmt.Print stmt) {
+    Object value = evaluate(stmt.expression);
+    System.out.println(stringify(value));
+
+    return null;
+  }
+
+  @Override
+  public Void visitVarStmt(Stmt.Var stmt) {
+    Object initialValue = null;
+
+    if (stmt.initializer != null) {
+      initialValue = evaluate(stmt.initializer);
+    }
+
+    currentEnvironment.define(stmt.name.lexeme, initialValue);
+
+    return null;
+  }
+
+  @Override
+  public Object visitAssignExpr(Expr.Assign expr) {
+    Object value = evaluate(expr.value);
+
+    currentEnvironment.define(expr.name.lexeme, value);
+
+    return value;
   }
 
   @Override
@@ -93,14 +140,23 @@ class Interpreter implements Expr.Visitor<Object> {
     return equality ? evaluate(expr.ifBranch) : evaluate(expr.elseBranch);
   }
 
+  @Override
+  public Object visitVariableExpr(Expr.Variable expr) {
+    return currentEnvironment.get(expr.name);
+  }
+
   private String stringify(Object object) {
-    if (object == null) return "nil";
+    if (object == null) {
+      return "nil";
+    }
 
     if (object instanceof Double) {
       String text = object.toString();
+
       if (text.endsWith(".0")) {
         text = text.substring(0, text.length() - 2);
       }
+
       return text;
     }
 
@@ -109,6 +165,24 @@ class Interpreter implements Expr.Visitor<Object> {
 
   private Object evaluate(Expr expr) {
     return expr.accept(this);
+  }
+
+  private void execute(Stmt stmt) {
+    stmt.accept(this);
+  }
+
+  void executeBlock(List<Stmt> statements, Environment environment) {
+    Environment previous = this.currentEnvironment;
+
+    try {
+      this.currentEnvironment = environment;
+
+      for (Stmt statement : statements) {
+        execute(statement);
+      }
+    } finally {
+      this.currentEnvironment = previous;
+    }
   }
 
   private boolean isTruthy(Object object) {
