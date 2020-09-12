@@ -8,7 +8,7 @@ A Lox implementation from the book [Crafting Interpreters](https://craftinginter
 - [x] 2. A Map of the Territory <sub><sup>September 8th, 2020</sup></sub>
 - [x] 3. The Lox Language <sub><sup>September 9th, 2020</sup></sub>
 - [x] 4. Scanning <sub><sup>September 10th, 2020</sup></sub>
-- [ ] 5. Representing Code
+- [x] 5. Representing Code <sub><sup>September 11th, 2020</sup></sub>
 - [ ] 6. Parsing Expressions
 - [ ] 7. Evaluating Expressions
 - [ ] 8. Statements and State
