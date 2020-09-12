@@ -9,7 +9,7 @@ A Lox implementation from the book [Crafting Interpreters](https://craftinginter
 - [x] 3. The Lox Language <sub><sup>September 9th, 2020</sup></sub>
 - [x] 4. Scanning <sub><sup>September 10th, 2020</sup></sub>
 - [x] 5. Representing Code <sub><sup>September 11th, 2020</sup></sub>
-- [ ] 6. Parsing Expressions
+- [x] 6. Parsing Expressions <sub><sup>September 12th, 2020</sup></sub>
 - [ ] 7. Evaluating Expressions
 - [ ] 8. Statements and State
 - [ ] 9. Control Flow

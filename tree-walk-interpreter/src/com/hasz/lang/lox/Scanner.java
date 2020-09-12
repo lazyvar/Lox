@@ -87,6 +87,8 @@ class Scanner {
 
           advance();
           advance();
+        } else {
+          addToken(SLASH);
         }
         break;
       case ' ':
