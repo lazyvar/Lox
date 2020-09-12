@@ -1,44 +1,49 @@
 package com.hasz.lang.lox;
 
+import java.util.ArrayList;
 import java.util.List;
 
-class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
+class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
   private Environment currentEnvironment = new Environment();
 
-  void interpret(List<Stmt> statements) {
+  Object interpret(List<Stmt> statements) {
+    ArrayList<Object> values = new ArrayList<>();
+
     try {
       for (Stmt statement : statements) {
-        execute(statement);
+        values.add(execute(statement));
       }
     } catch (RuntimeError error) {
       Main.runtimeError(error);
     }
+
+    if (values.isEmpty()) {
+      return null;
+    } else {
+      return values.get(values.size() - 1);
+    }
   }
 
   @Override
-  public Void visitBlockStmt(Stmt.Block stmt) {
-    executeBlock(stmt.statements, new Environment(currentEnvironment));
-
-    return null;
+  public Object visitBlockStmt(Stmt.Block stmt) {
+    return executeBlock(stmt.statements, new Environment(currentEnvironment));
   }
 
   @Override
-  public Void visitExpressionStmt(Stmt.Expression stmt) {
-    evaluate(stmt.expression);
-
-    return null;
+  public Object visitExpressionStmt(Stmt.Expression stmt) {
+    return evaluate(stmt.expression);
   }
 
   @Override
-  public Void visitPrintStmt(Stmt.Print stmt) {
+  public Object visitPrintStmt(Stmt.Print stmt) {
     Object value = evaluate(stmt.expression);
-    System.out.println(stringify(value));
+    System.out.println(new StringRendering(value));
 
     return null;
   }
 
   @Override
-  public Void visitVarStmt(Stmt.Var stmt) {
+  public Object visitVarStmt(Stmt.Var stmt) {
     Object initialValue = null;
 
     if (stmt.initializer != null) {
@@ -47,7 +52,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     currentEnvironment.define(stmt.name.lexeme, initialValue);
 
-    return null;
+    return initialValue;
   }
 
   @Override
@@ -145,43 +150,32 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     return currentEnvironment.get(expr.name);
   }
 
-  private String stringify(Object object) {
-    if (object == null) {
-      return "nil";
-    }
-
-    if (object instanceof Double) {
-      String text = object.toString();
-
-      if (text.endsWith(".0")) {
-        text = text.substring(0, text.length() - 2);
-      }
-
-      return text;
-    }
-
-    return object.toString();
-  }
-
   private Object evaluate(Expr expr) {
     return expr.accept(this);
   }
 
-  private void execute(Stmt stmt) {
-    stmt.accept(this);
+  private Object execute(Stmt stmt) {
+    return stmt.accept(this);
   }
 
-  void executeBlock(List<Stmt> statements, Environment environment) {
+  private Object executeBlock(List<Stmt> statements, Environment environment) {
     Environment previous = this.currentEnvironment;
+    ArrayList<Object> values = new ArrayList<>();
 
     try {
       this.currentEnvironment = environment;
 
       for (Stmt statement : statements) {
-        execute(statement);
+        values.add(execute(statement));
       }
     } finally {
       this.currentEnvironment = previous;
+    }
+
+    if (values.isEmpty()) {
+      return null;
+    } else {
+      return values.get(values.size() - 1);
     }
   }
 

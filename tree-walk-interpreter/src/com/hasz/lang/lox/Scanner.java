@@ -46,6 +46,7 @@ class Scanner {
       scanToken();
     }
 
+    tokens.add(new Token(SEMICOLON, "", null, line));
     tokens.add(new Token(EOF, "", null, line));
 
     return tokens;

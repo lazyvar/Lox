@@ -61,6 +61,10 @@ class Parser {
       return new Stmt.Block(block());
     }
 
+    if (matchAndAdvance(SEMICOLON)) {
+      return new Stmt.Expression(new Expr.Literal(null));
+    }
+
     return expressionStatement();
   }
 
@@ -197,7 +201,7 @@ class Parser {
     }
 
     if (matchAndAdvance(NIL)) {
-      return new Expr.Literal(false);
+      return new Expr.Literal(null);
     }
 
     if (matchAndAdvance(STRING, NUMBER)) {

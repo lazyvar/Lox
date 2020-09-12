@@ -51,13 +51,13 @@ public class Main {
 
       if (line == null) break;
 
-      run(line);
+      System.out.println(new StringRendering(run(line)));
 
       hadError = false;
     }
   }
 
-  private static void run(String source) {
+  private static Object run(String source) {
     Scanner scanner = new Scanner(source);
     List<Token> tokens = scanner.scanTokens();
 
@@ -65,10 +65,10 @@ public class Main {
     List<Stmt> statements = parser.parse();
 
     if (hadError) {
-      return;
+      return null;
     }
 
-    interpreter.interpret(statements);
+    return interpreter.interpret(statements);
   }
 
   static void error(int line, String message) {
