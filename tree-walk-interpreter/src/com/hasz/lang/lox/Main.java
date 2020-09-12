@@ -12,8 +12,8 @@ public class Main {
   private static final Interpreter interpreter = new Interpreter();
   private static final AstPrinter printer = new AstPrinter();
 
-  static boolean hadError = false;
-  static boolean hadRuntimeError = false;
+  static ParseError parseError = null;
+  static RuntimeError runtimeError = null;
 
   public static void main(String[] args) throws IOException {
     if (args.length > 1) {
@@ -31,11 +31,11 @@ public class Main {
 
     run(new String(bytes, Charset.defaultCharset()));
 
-    if (hadError) {
+    if (parseError != null) {
       System.exit(65);
     }
 
-    if (hadRuntimeError) {
+    if (runtimeError != null) {
       System.exit(70);
     }
   }
@@ -51,9 +51,18 @@ public class Main {
 
       if (line == null) break;
 
-      System.out.println(new StringRendering(run(line)));
+      StringRendering lastStatement = new StringRendering(run(line));
 
-      hadError = false;
+      if (parseError != null) {
+        report(parseError);
+      } else if (runtimeError != null) {
+        report(runtimeError);
+      } else {
+        System.out.println(lastStatement);
+      }
+
+      parseError = null;
+      runtimeError = null;
     }
   }
 
@@ -64,7 +73,8 @@ public class Main {
     Parser parser = new Parser(tokens);
     List<Stmt> statements = parser.parse();
 
-    if (hadError) {
+    if (parseError != null) {
+
       return null;
     }
 
@@ -72,24 +82,26 @@ public class Main {
   }
 
   static void error(int line, String message) {
-    report(line, "", message);
+    parseError = new ParseError(line, message);
   }
 
   static void error(Token token, String message) {
-    if (token.type == TokenType.EOF) {
-      report(token.line, " at end", message);
-    } else {
-      report(token.line, " at '" + token.lexeme + "'", message);
-    }
+    parseError = new ParseError(token, message);
   }
 
-  private static void report(int line, String where, String message) {
-    System.err.println("[line " + line + "] Error" + where + ": " + message);
-    hadError = true;
+  private static void report(RuntimeError error) {
+    printError(error.getMessage() + "\n[line " + error.token.line + "]");
+  }
+
+  private static void report(ParseError error) {
+    printError(error.getMessage());
+  }
+
+  private static void printError(String message) {
+    System.out.println("\u001B[31m" + message + "\u001B[0m");
   }
 
   public static void runtimeError(RuntimeError error) {
-    System.err.println(error.getMessage() + "\n[line " + error.token.line + "]");
-    hadRuntimeError = true;
+    runtimeError = error;
   }
 }

@@ -46,7 +46,10 @@ class Scanner {
       scanToken();
     }
 
-    tokens.add(new Token(SEMICOLON, "", null, line));
+    if (!tokens.isEmpty() && tokens.get(tokens.size() - 1).type != SEMICOLON) {
+      tokens.add(new Token(SEMICOLON, "", null, line));
+    }
+
     tokens.add(new Token(EOF, "", null, line));
 
     return tokens;
