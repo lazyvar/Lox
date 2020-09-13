@@ -27,7 +27,9 @@ class Parser {
 
   private Stmt declaration() {
     try {
-      if (matchAndAdvance(FUN)) {
+      if (matchAndAdvance(CLASS)) {
+        return classDeclaration();
+      } else if (matchAndAdvance(FUN)) {
         return funDeclaration("function");
       } else if (matchAndAdvance(VAR)) {
         return varDeclaration();
@@ -41,7 +43,23 @@ class Parser {
     }
   }
 
-  private Stmt funDeclaration(String kind) {
+  private Stmt classDeclaration() {
+    Token name = consume(IDENTIFIER, "Expect class name.");
+
+    consume(LEFT_BRACE, "Expect '{' before class body.");
+
+    List<Stmt.Function> methods = new ArrayList<>();
+
+    while (!check(RIGHT_BRACE) && !isAtEnd()) {
+      methods.add(funDeclaration("method"));
+    }
+
+    consume(RIGHT_BRACE, "Expect '}' after class body.");
+
+    return new Stmt.Class(name, methods);
+  }
+
+  private Stmt.Function funDeclaration(String kind) {
     Token name = consume(IDENTIFIER, "Expected a variable name.");
     List<Token> parameters = new ArrayList<>();
 
@@ -229,6 +247,10 @@ class Parser {
         Token name = ((Expr.Variable) expr).name;
 
         return new Expr.Assign(name, value);
+      } else if (expr instanceof Expr.Get) {
+        Expr.Get get = (Expr.Get) expr;
+
+        return new Expr.Set(get.object, get.name, value);
       } else {
         error(equals, "Invalid assignment target.");
       }
@@ -335,6 +357,9 @@ class Parser {
     while (true) {
       if (matchAndAdvance(LEFT_PAREN)) {
         expr = finishCall(expr);
+      } else if (matchAndAdvance(DOT)) {
+        Token name = consume(IDENTIFIER, "Expected property name after '.'.");
+        expr = new Expr.Get(expr, name);
       } else {
         break;
       }
@@ -372,6 +397,10 @@ class Parser {
 
     if (matchAndAdvance(STRING, NUMBER)) {
       return new Expr.Literal(previous().literal);
+    }
+
+    if (matchAndAdvance(THIS)) {
+      return new Expr.This(previous());
     }
 
     if (matchAndAdvance(IDENTIFIER)) {

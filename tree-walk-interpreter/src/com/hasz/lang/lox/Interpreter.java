@@ -63,6 +63,21 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
   }
 
   @Override
+  public Object visitClassStmt(Stmt.Class stmt) {
+    Map<String, LoxFunction> methods = new HashMap<>();
+
+    currentEnvironment.define(stmt.name.lexeme, null);
+
+    for (Stmt.Function method : stmt.methods) {
+      methods.put(method.name.lexeme, new LoxFunction(method, currentEnvironment, method.name.lexeme.equals("init")));
+    }
+
+    currentEnvironment.assign(stmt.name, new LoxClass(stmt.name.lexeme, methods));
+
+    return null;
+  }
+
+  @Override
   public Object visitExpressionStmt(Stmt.Expression stmt) {
     return evaluate(stmt.expression);
   }
@@ -88,7 +103,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
 
   @Override
   public Object visitFunctionStmt(Stmt.Function stmt) {
-    LoxFunction fn = new LoxFunction(stmt, currentEnvironment);
+    LoxFunction fn = new LoxFunction(stmt, currentEnvironment, false);
 
     currentEnvironment.define(stmt.name.lexeme, fn);
 
@@ -237,8 +252,38 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
   }
 
   @Override
+  public Object visitGetExpr(Expr.Get expr) {
+    Object object = evaluate(expr.object);
+
+    if (object instanceof LoxInstance) {
+      return ((LoxInstance) object).get(expr.name);
+    }
+
+    throw new RuntimeError(expr.name, "Only instances have properties.");
+  }
+
+  @Override
+  public Object visitSetExpr(Expr.Set expr) {
+    Object object = evaluate(expr.object);
+
+    if (!(object instanceof LoxInstance)) {
+      throw new RuntimeError(expr.name, "Only instances have fields.");
+    }
+
+    Object value = evaluate(expr.value);
+    ((LoxInstance) object).set(expr.name, value);
+
+    return value;
+  }
+
+  @Override
   public Object visitGroupingExpr(Expr.Grouping expr) {
     return evaluate(expr.expression);
+  }
+
+  @Override
+  public Object visitThisExpr(Expr.This expr) {
+    return lookUpVariable(expr.keyword, expr);
   }
 
   @Override
@@ -304,6 +349,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
 
   private Object lookUpVariable(Token name, Expr expr) {
     Integer distance = locals.get(expr);
+
     if (distance != null) {
       return currentEnvironment.getAt(distance, name.lexeme);
     } else {
