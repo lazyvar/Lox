@@ -1,5 +1,7 @@
 package com.hasz.lang.lox;
 
+import java.util.List;
+
 class AstPrinter implements Expr.Visitor<String> {
   void print(Expr expr) {
     System.out.println(describe(expr));
@@ -17,6 +19,11 @@ class AstPrinter implements Expr.Visitor<String> {
   @Override
   public String visitBinaryExpr(Expr.Binary expr) {
     return parenthesize(expr.operator.lexeme, expr.left, expr.right);
+  }
+
+  @Override
+  public String visitCallExpr(Expr.Call expr) {
+    return "";
   }
 
   @Override

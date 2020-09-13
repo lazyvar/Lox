@@ -58,7 +58,7 @@ public class Main {
       } else if (runtimeError != null) {
         report(runtimeError);
       } else {
-        System.out.println(lastStatement);
+        System.out.println("  => " + lastStatement);
       }
 
       parseError = null;

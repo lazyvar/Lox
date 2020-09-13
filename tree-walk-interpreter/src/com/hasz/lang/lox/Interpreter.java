@@ -4,7 +4,28 @@ import java.util.ArrayList;
 import java.util.List;
 
 class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
-  private Environment currentEnvironment = new Environment();
+  final Environment globals = new Environment();
+
+  private Environment currentEnvironment = globals;
+
+  Interpreter() {
+    globals.define("clock", new LoxCallable() {
+      @Override
+      public int arity() {
+        return 0;
+      }
+
+      @Override
+      public Object call(Interpreter interpreter, List<Object> arguments) {
+        return (double) System.currentTimeMillis() / 1000.0;
+      }
+
+      @Override
+      public String toString() {
+        return "<native fn>";
+      }
+    });
+  }
 
   Object interpret(List<Stmt> statements) {
     ArrayList<Object> values = new ArrayList<>();
@@ -45,6 +66,26 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
     System.out.println(new StringRendering(value));
 
     return null;
+  }
+
+  @Override
+  public Object visitReturnStmt(Stmt.Return stmt) {
+    Object value = null;
+
+    if (stmt.value != null) {
+      value = evaluate(stmt.value);
+    }
+
+    throw new Return(value);
+  }
+
+  @Override
+  public Object visitFunctionStmt(Stmt.Function stmt) {
+    LoxFunction fn = new LoxFunction(stmt, currentEnvironment);
+
+    currentEnvironment.define(stmt.name.lexeme, fn);
+
+    return fn;
   }
 
   @Override
@@ -103,7 +144,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
   public Object visitAssignExpr(Expr.Assign expr) {
     Object value = evaluate(expr.value);
 
-    currentEnvironment.define(expr.name.lexeme, value);
+    currentEnvironment.assign(expr.name, value);
 
     return value;
   }
@@ -155,6 +196,32 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
       case EQUAL_EQUAL: return isEqual(left, right);
       default: return null;
     }
+  }
+
+  @Override
+  public Object visitCallExpr(Expr.Call expr) {
+    Object callee = evaluate(expr.callee);
+    List<Object> arguments = new ArrayList<>();
+
+    for (Expr argument : expr.arguments) {
+      arguments.add(evaluate(argument));
+    }
+
+    if (callee == null) {
+      throw new RuntimeError(expr.paren, "Variable is nil.");
+    }
+
+    if (!(callee instanceof LoxCallable)) {
+      throw new RuntimeError(expr.paren, "Can only call functions and classes.");
+    }
+
+    LoxCallable function = (LoxCallable) callee;
+
+    if (arguments.size() != function.arity()) {
+      throw new RuntimeError(expr.paren, "Expected " + function.arity() + " arguments but got " + arguments.size() + ".");
+    }
+
+    return function.call(this, arguments);
   }
 
   @Override
@@ -223,7 +290,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
     return stmt.accept(this);
   }
 
-  private Object executeBlock(List<Stmt> statements, Environment environment) {
+  Object executeBlock(List<Stmt> statements, Environment environment) {
     Environment previous = this.currentEnvironment;
     ArrayList<Object> values = new ArrayList<>();
 

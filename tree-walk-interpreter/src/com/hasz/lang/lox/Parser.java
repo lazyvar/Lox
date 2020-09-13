@@ -27,7 +27,9 @@ class Parser {
 
   private Stmt declaration() {
     try {
-      if (matchAndAdvance(VAR)) {
+      if (matchAndAdvance(FUN)) {
+        return funDeclaration("function");
+      } else if (matchAndAdvance(VAR)) {
         return varDeclaration();
       } else {
         return statement();
@@ -37,6 +39,26 @@ class Parser {
 
       return null;
     }
+  }
+
+  private Stmt funDeclaration(String kind) {
+    Token name = consume(IDENTIFIER, "Expected a variable name.");
+    List<Token> parameters = new ArrayList<>();
+
+    consume(LEFT_PAREN, "Expect '(' after " + kind + " name.");
+
+    if (!check(RIGHT_PAREN)) {
+      do {
+        parameters.add(consume(IDENTIFIER, "Expect parameter name."));
+      } while (matchAndAdvance(COMMA));
+    }
+
+    consume(RIGHT_PAREN, "Expect ')' after parameters.");
+    consume(LEFT_BRACE, "Expect '{' before " + kind + " body.");
+
+    List<Stmt> body = block();
+
+    return new Stmt.Function(name, parameters, body);
   }
 
   private Stmt varDeclaration() {
@@ -65,6 +87,10 @@ class Parser {
       return printStatement();
     }
 
+    if (matchAndAdvance(RETURN)) {
+      return returnStatement();
+    }
+
     if (matchAndAdvance(WHILE)) {
       return whileStatement();
     }
@@ -83,9 +109,22 @@ class Parser {
   private Stmt printStatement() {
     Expr value = expression();
 
-    consume(SEMICOLON, "Expect ';' after value.");
+    consume(SEMICOLON, "Expected ';' after value.");
 
     return new Stmt.Print(value);
+  }
+
+  private Stmt returnStatement() {
+    Token keyword = previous();
+    Expr value = null;
+
+    if (!check(SEMICOLON)) {
+      value = expression();
+    }
+
+    consume(SEMICOLON, "Expected ';' after return value.");
+
+    return new Stmt.Return(keyword, value);
   }
 
   private Stmt forStatement() {
@@ -107,7 +146,7 @@ class Parser {
       condition = expression();
     }
 
-    consume(SEMICOLON, "Expect ';' after loop condition.");
+    consume(SEMICOLON, "Expected ';' after loop condition.");
 
     Expr increment = null;
 
@@ -115,7 +154,7 @@ class Parser {
       increment = expression();
     }
 
-    consume(RIGHT_PAREN, "Expect ')' after for clauses.");
+    consume(RIGHT_PAREN, "Expected ')' after for clauses.");
     consume(LEFT_BRACE, "Expected '{' after ')'.");
 
     Stmt body = new Stmt.Block(block());
@@ -158,7 +197,7 @@ class Parser {
   private Stmt expressionStatement() {
     Expr expr = expression();
 
-    consume(SEMICOLON, "Expect ';' after expression.");
+    consume(SEMICOLON, "Expected ';' after expression.");
 
     return new Stmt.Expression(expr);
   }
@@ -286,8 +325,36 @@ class Parser {
     if (matchAndAdvance(BANG, MINUS)) {
       return new Expr.Unary(previous(), unary());
     } else {
-      return primary();
+      return call();
     }
+  }
+
+  private Expr call() {
+    Expr expr = primary();
+
+    while (true) {
+      if (matchAndAdvance(LEFT_PAREN)) {
+        expr = finishCall(expr);
+      } else {
+        break;
+      }
+    }
+
+    return expr;
+  }
+
+  private Expr finishCall(Expr callee) {
+    List<Expr> arguments = new ArrayList<>();
+
+    if (!check(RIGHT_PAREN)) {
+      do {
+        arguments.add(conditional());
+      } while (matchAndAdvance(COMMA));
+    }
+
+    Token paren = consume(RIGHT_PAREN, "Expected ')' after arguments.");
+
+    return new Expr.Call(callee, paren, arguments);
   }
 
   private Expr primary() {
