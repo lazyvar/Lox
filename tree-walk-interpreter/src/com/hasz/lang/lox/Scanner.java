@@ -46,7 +46,7 @@ class Scanner {
       scanToken();
     }
 
-    if (!tokens.isEmpty() && tokens.get(tokens.size() - 1).type != SEMICOLON) {
+    if (!tokens.isEmpty() && tokens.get(tokens.size() - 1).type != SEMICOLON && tokens.get(tokens.size() - 1).type != RIGHT_BRACE) {
       tokens.add(new Token(SEMICOLON, "", null, line));
     }
 

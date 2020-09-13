@@ -12,7 +12,7 @@ A Lox implementation from the book [Crafting Interpreters](https://craftinginter
 - [x] 6. Parsing Expressions <sub><sup>September 12th, 2020</sup></sub>
 - [x] 7. Evaluating Expressions <sub><sup>September 12th, 2020</sup></sub>
 - [x] 8. Statements and State <sub><sup>September 12th, 2020</sup></sub>
-- [ ] 9. Control Flow
+- [x] 9. Control Flow <sub><sup>September 12th, 2020</sup></sub>
 - [ ] 10. Functions
 - [ ] 11. Resolving and Binding
 - [ ] 12. Classes

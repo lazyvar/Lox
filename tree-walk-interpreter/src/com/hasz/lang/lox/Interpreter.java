@@ -25,8 +25,13 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
   }
 
   @Override
-  public Object visitBlockStmt(Stmt.Block stmt) {
+  public Object visitScopedBlockStmt(Stmt.ScopedBlock stmt) {
     return executeBlock(stmt.statements, new Environment(currentEnvironment));
+  }
+
+  @Override
+  public Object visitBlockStmt(Stmt.Block stmt) {
+    return executeBlock(stmt.statements, currentEnvironment);
   }
 
   @Override
@@ -43,6 +48,19 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
   }
 
   @Override
+  public Object visitIfStmt(Stmt.If stmt) {
+    boolean condition = isTruthy(evaluate(stmt.condition));
+
+    if (condition) {
+      return execute(stmt.thenBranch);
+    } else if (stmt.elseBranch != null) {
+      return execute(stmt.elseBranch);
+    } else {
+      return null;
+    }
+  }
+
+  @Override
   public Object visitVarStmt(Stmt.Var stmt) {
     Object initialValue = null;
 
@@ -53,6 +71,32 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
     currentEnvironment.define(stmt.name.lexeme, initialValue);
 
     return initialValue;
+  }
+
+  @Override
+  public Object visitWhileStmt(Stmt.While stmt) {
+    while (isTruthy(evaluate(stmt.condition))) {
+      execute(stmt.body);
+    }
+
+    return null;
+  }
+
+  @Override
+  public Object visitForStmt(Stmt.For stmt) {
+    if (stmt.initial != null) {
+      execute(stmt.initial);
+    }
+
+    while (stmt.condition == null || isTruthy(evaluate(stmt.condition))) {
+      execute(stmt.body);
+
+      if (stmt.increment != null) {
+        evaluate(stmt.increment);
+      }
+    }
+
+    return null;
   }
 
   @Override
@@ -140,14 +184,35 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
 
   @Override
   public Object visitConditionalExpr(Expr.Conditional expr) {
-    boolean equality = isTruthy(evaluate(expr.equality));
+    boolean condition = isTruthy(evaluate(expr.condition));
 
-    return equality ? evaluate(expr.ifBranch) : evaluate(expr.elseBranch);
+    return condition ? evaluate(expr.ifBranch) : evaluate(expr.elseBranch);
   }
 
   @Override
   public Object visitVariableExpr(Expr.Variable expr) {
     return currentEnvironment.get(expr.name);
+  }
+
+  @Override
+  public Object visitLogicalExpr(Expr.Logical expr) {
+    Object left = evaluate(expr.left);
+    boolean leftIsTruthy = isTruthy(left);
+
+    switch (expr.operator.type) {
+      case OR:
+        if (!leftIsTruthy) {
+          return evaluate(expr.right);
+        }
+        break;
+      case AND:
+        if (leftIsTruthy) {
+          return evaluate(expr.right);
+        }
+        break;
+    }
+
+    return left;
   }
 
   private Object evaluate(Expr expr) {

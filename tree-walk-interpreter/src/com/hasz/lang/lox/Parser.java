@@ -53,12 +53,24 @@ class Parser {
   }
 
   private Stmt statement() {
+    if (matchAndAdvance(FOR)) {
+      return forStatement();
+    }
+
+    if (matchAndAdvance(IF)) {
+      return ifStatement();
+    }
+
     if (matchAndAdvance(PRINT)) {
       return printStatement();
     }
 
+    if (matchAndAdvance(WHILE)) {
+      return whileStatement();
+    }
+
     if (matchAndAdvance(LEFT_BRACE)) {
-      return new Stmt.Block(block());
+      return new Stmt.ScopedBlock(block());
     }
 
     if (matchAndAdvance(SEMICOLON)) {
@@ -74,6 +86,73 @@ class Parser {
     consume(SEMICOLON, "Expect ';' after value.");
 
     return new Stmt.Print(value);
+  }
+
+  private Stmt forStatement() {
+    consume(LEFT_PAREN, "Expected '(' after 'for'.");
+
+    Stmt initializer;
+
+    if (matchAndAdvance(SEMICOLON)) {
+      initializer = null;
+    } else if (matchAndAdvance(VAR)) {
+      initializer = varDeclaration();
+    } else {
+      initializer = expressionStatement();
+    }
+
+    Expr condition = null;
+
+    if (!check(SEMICOLON)) {
+      condition = expression();
+    }
+
+    consume(SEMICOLON, "Expect ';' after loop condition.");
+
+    Expr increment = null;
+
+    if (!check(RIGHT_PAREN)) {
+      increment = expression();
+    }
+
+    consume(RIGHT_PAREN, "Expect ')' after for clauses.");
+    consume(LEFT_BRACE, "Expected '{' after ')'.");
+
+    Stmt body = new Stmt.Block(block());
+
+    return new Stmt.For(initializer, condition, increment, body);
+  }
+
+  private Stmt ifStatement() {
+    consume(LEFT_PAREN, "Expected '(' after 'if'.");
+
+    Expr condition = expression();
+
+    consume(RIGHT_PAREN, "Expected ')' after 'if'.");
+    consume(LEFT_BRACE, "Expected '{' after ')'.");
+
+    Stmt thenBranch = new Stmt.Block(block());
+    Stmt elseBranch = null;
+
+    if (matchAndAdvance(ELSE)) {
+      consume(LEFT_BRACE, "Expected '(' after 'else'.");
+      elseBranch = new Stmt.Block(block());
+    }
+
+    return new Stmt.If(condition, thenBranch, elseBranch);
+  }
+
+  private Stmt whileStatement() {
+    consume(LEFT_PAREN, "Expected '(' after 'while'.");
+
+    Expr condition = expression();
+
+    consume(RIGHT_PAREN, "Expected ')' after 'while'.");
+    consume(LEFT_BRACE, "Expected '{' after ')'.");
+
+    Stmt body = new Stmt.Block(block());
+
+    return new Stmt.While(condition, body);
   }
 
   private Stmt expressionStatement() {
@@ -130,7 +209,7 @@ class Parser {
   }
 
   private Expr conditional() {
-    Expr equality = equality();
+    Expr equality = or();
 
     if (matchAndAdvance(QUESTION_MARK)) {
       Expr ifBranch = expression();
@@ -141,6 +220,26 @@ class Parser {
     }
 
     return equality;
+  }
+
+  private Expr or() {
+    Expr expr = and();
+
+    while (matchAndAdvance(OR)) {
+      expr = new Expr.Logical(expr, previous(), and());
+    }
+
+    return expr;
+  }
+
+  private Expr and() {
+    Expr expr = equality();
+
+    while (matchAndAdvance(AND)) {
+      expr = new Expr.Logical(expr, previous(), equality());
+    }
+
+    return expr;
   }
 
   private Expr equality() {
@@ -197,7 +296,7 @@ class Parser {
     }
 
     if (matchAndAdvance(TRUE)) {
-      return new Expr.Literal(false);
+      return new Expr.Literal(true);
     }
 
     if (matchAndAdvance(NIL)) {

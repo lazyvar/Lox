@@ -40,12 +40,17 @@ class AstPrinter implements Expr.Visitor<String> {
 
   @Override
   public String visitConditionalExpr(Expr.Conditional expr) {
-    return parenthesize("?", expr.equality, expr.ifBranch, expr.elseBranch);
+    return parenthesize("?", expr.condition, expr.ifBranch, expr.elseBranch);
   }
 
   @Override
   public String visitVariableExpr(Expr.Variable expr) {
     return parenthesize("access-var", expr);
+  }
+
+  @Override
+  public String visitLogicalExpr(Expr.Logical expr) {
+    return visitBinaryExpr(new Expr.Binary(expr.left, expr.operator, expr.right));
   }
 
   private String parenthesize(String name, Expr... expressions) {
