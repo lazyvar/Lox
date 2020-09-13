@@ -7,6 +7,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Stack;
 
 public class Main {
   private static final Interpreter interpreter = new Interpreter();
@@ -69,12 +70,17 @@ public class Main {
   private static Object run(String source) {
     Scanner scanner = new Scanner(source);
     List<Token> tokens = scanner.scanTokens();
-
     Parser parser = new Parser(tokens);
     List<Stmt> statements = parser.parse();
+    Resolver resolver = new Resolver(interpreter);
 
     if (parseError != null) {
+      return null;
+    }
 
+    resolver.resolve(statements);
+
+    if (parseError != null) {
       return null;
     }
 

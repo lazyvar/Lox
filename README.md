@@ -14,7 +14,7 @@ A Lox implementation from the book [Crafting Interpreters](https://craftinginter
 - [x] 8. Statements and State <sub><sup>September 12th, 2020</sup></sub>
 - [x] 9. Control Flow <sub><sup>September 12th, 2020</sup></sub>
 - [x] 10. Functions <sub><sup>September 12th, 2020</sup></sub>
-- [ ] 11. Resolving and Binding
+- [x] 11. Resolving and Binding <sub><sup>September 13th, 2020</sup></sub>
 - [ ] 12. Classes
 - [ ] 13. Inheritance
 - [ ] 14. Chunks of Bytecode
