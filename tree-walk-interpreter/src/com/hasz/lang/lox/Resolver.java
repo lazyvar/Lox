@@ -20,7 +20,7 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
   }
 
   private enum ClassType {
-    NONE, CLASS
+    NONE, CLASS, SUBCLASS
   }
 
   void resolve(List<Stmt> statements) {
@@ -82,6 +82,25 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
   public Void visitThisExpr(Expr.This expr) {
     if (currentClass == ClassType.NONE) {
       Main.error(expr.keyword, "Cannot use 'this' outside of a class.");
+
+      return null;
+    }
+
+    resolveLocal(expr, expr.keyword);
+
+    return null;
+  }
+
+  @Override
+  public Void visitSuperExpr(Expr.Super expr) {
+    if (currentClass == ClassType.NONE) {
+      Main.error(expr.keyword, "Cannot use 'super' outside of a class.");
+
+      return null;
+    }
+
+    if (currentClass == ClassType.CLASS) {
+      Main.error(expr.keyword, "Cannot use 'super' outside of a class.");
 
       return null;
     }
@@ -154,11 +173,31 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     currentClass = ClassType.CLASS;
     declare(stmt.name);
     define(stmt.name);
+
+    if (stmt.superclass != null) {
+      currentClass = ClassType.SUBCLASS;
+
+      if (stmt.name.lexeme.equals(stmt.superclass.name.lexeme)) {
+        Main.error(stmt.superclass.name, "A class cannot inherit from itself.");
+      }
+
+      resolve(stmt.superclass);
+    }
+
+    if (stmt.superclass != null) {
+      beginScope();
+      scopes.peek().put("super", true);
+    }
+
     beginScope();
     scopes.peek().put("this", true);
 
     for (Stmt.Function method : stmt.methods) {
       resolveFunction(method, method.name.lexeme.equals("init") ? FunctionType.INITIALIZER : FunctionType.METHOD);
+    }
+
+    if (stmt.superclass != null) {
+      endScope();
     }
 
     endScope();
