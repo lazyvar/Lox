@@ -18,7 +18,7 @@ A Lox implementation from the book [Crafting Interpreters](https://craftinginter
 - [x] 12. Classes <sub><sup>September 13th, 2020</sup></sub>
 - [x] 13. Inheritance <sub><sup>September 13th, 2020</sup></sub>
 - [x] 14. Chunks of Bytecode <sub><sup>September 16th, 2020</sup></sub>
-- [ ] 15. A Virtual Machine
+- [x] 15. A Virtual Machine <sub><sup>September 22nd, 2020</sup></sub>
 - [ ] 16. Scanning on Demand
 - [ ] 17. Compiling Expressions
 - [ ] 18. Types of Values
