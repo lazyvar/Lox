@@ -11,11 +11,11 @@ static void resetStack() {
   vm.stackTop = vm.stack;
 }
 
-void initVM() {
+void initVM(void) {
   resetStack();
 }
 
-void freeVM() {
+void freeVM(void) {
   
 }
 
@@ -24,7 +24,7 @@ void push(Value value) {
   vm.stackTop++;
 }
 
-Value pop() {
+Value pop(void) {
   vm.stackTop--;
 
   return *vm.stackTop;

@@ -198,7 +198,7 @@ static Token number() {
   return makeToken(TOKEN_NUMBER);
 }
 
-Token scanToken() {
+Token scanToken(void) {
   skipWhitespace();
 
   scanner.start = scanner.current;
