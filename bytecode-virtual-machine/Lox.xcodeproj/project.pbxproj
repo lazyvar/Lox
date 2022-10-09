@@ -15,6 +15,7 @@
 		01106F9428CAC3B100296492 /* value.c in Sources */ = {isa = PBXBuildFile; fileRef = 01106F8928CAC3B100296492 /* value.c */; };
 		01106F9628CAC3B100296492 /* vm.c in Sources */ = {isa = PBXBuildFile; fileRef = 01106F8C28CAC3B100296492 /* vm.c */; };
 		01106F9728CAC3B100296492 /* debug.c in Sources */ = {isa = PBXBuildFile; fileRef = 01106F8D28CAC3B100296492 /* debug.c */; };
+		01A175FD28F3184400423414 /* object.c in Sources */ = {isa = PBXBuildFile; fileRef = 01A175FC28F3184400423414 /* object.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -48,6 +49,8 @@
 		01106F8C28CAC3B100296492 /* vm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vm.c; sourceTree = "<group>"; };
 		01106F8D28CAC3B100296492 /* debug.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = debug.c; sourceTree = "<group>"; };
 		01106F8E28CAC3B100296492 /* common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = common.h; sourceTree = "<group>"; };
+		01A175FB28F3184400423414 /* object.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = object.h; sourceTree = "<group>"; };
+		01A175FC28F3184400423414 /* object.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = object.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -97,6 +100,8 @@
 				01106F8C28CAC3B100296492 /* vm.c */,
 				01106F8B28CAC3B100296492 /* vm.h */,
 				01106F7728CAC37100296492 /* main.c */,
+				01A175FB28F3184400423414 /* object.h */,
+				01A175FC28F3184400423414 /* object.c */,
 			);
 			path = Lox;
 			sourceTree = "<group>";
@@ -161,6 +166,7 @@
 				01106F9128CAC3B100296492 /* scanner.c in Sources */,
 				01106F9728CAC3B100296492 /* debug.c in Sources */,
 				01106F7828CAC37100296492 /* main.c in Sources */,
+				01A175FD28F3184400423414 /* object.c in Sources */,
 				01106F9228CAC3B100296492 /* memory.c in Sources */,
 				01106F8F28CAC3B100296492 /* chunk.c in Sources */,
 				01106F9028CAC3B100296492 /* compiler.c in Sources */,
