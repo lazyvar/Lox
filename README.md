@@ -21,7 +21,7 @@ A Lox implementation from the book [Crafting Interpreters](https://craftinginter
 - [x] 15. A Virtual Machine <sub><sup>September 22nd, 2020</sup></sub>
 - [x] 16. Scanning on Demand <sub><sup>September 27th, 2020</sup></sub>
 - [x] 17. Compiling Expressions <sub><sup>October 9th, 2022</sup></sub>
-- [ ] 18. Types of Values
+- [x] 18. Types of Values <sub><sup>October 9th, 2022</sup></sub>
 - [ ] 19. Strings
 - [ ] 20. Hash Tables
 - [ ] 21. Global Variables
