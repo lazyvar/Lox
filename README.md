@@ -20,7 +20,7 @@ A Lox implementation from the book [Crafting Interpreters](https://craftinginter
 - [x] 14. Chunks of Bytecode <sub><sup>September 16th, 2020</sup></sub>
 - [x] 15. A Virtual Machine <sub><sup>September 22nd, 2020</sup></sub>
 - [x] 16. Scanning on Demand <sub><sup>September 27th, 2020</sup></sub>
-- [ ] 17. Compiling Expressions
+- [x] 17. Compiling Expressions <sub><sup>October 9th, 2022</sup></sub>
 - [ ] 18. Types of Values
 - [ ] 19. Strings
 - [ ] 20. Hash Tables
