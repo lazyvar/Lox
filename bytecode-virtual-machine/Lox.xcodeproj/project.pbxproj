@@ -16,6 +16,7 @@
 		01106F9628CAC3B100296492 /* vm.c in Sources */ = {isa = PBXBuildFile; fileRef = 01106F8C28CAC3B100296492 /* vm.c */; };
 		01106F9728CAC3B100296492 /* debug.c in Sources */ = {isa = PBXBuildFile; fileRef = 01106F8D28CAC3B100296492 /* debug.c */; };
 		01A175FD28F3184400423414 /* object.c in Sources */ = {isa = PBXBuildFile; fileRef = 01A175FC28F3184400423414 /* object.c */; };
+		01A1760028F33FDB00423414 /* table.c in Sources */ = {isa = PBXBuildFile; fileRef = 01A175FF28F33FDB00423414 /* table.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -51,6 +52,8 @@
 		01106F8E28CAC3B100296492 /* common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = common.h; sourceTree = "<group>"; };
 		01A175FB28F3184400423414 /* object.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = object.h; sourceTree = "<group>"; };
 		01A175FC28F3184400423414 /* object.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = object.c; sourceTree = "<group>"; };
+		01A175FE28F33FDB00423414 /* table.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = table.h; sourceTree = "<group>"; };
+		01A175FF28F33FDB00423414 /* table.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = table.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -84,6 +87,8 @@
 			isa = PBXGroup;
 			children = (
 				01106F7E28CAC3B000296492 /* chunk.c */,
+				01A175FE28F33FDB00423414 /* table.h */,
+				01A175FF28F33FDB00423414 /* table.c */,
 				01106F8728CAC3B100296492 /* chunk.h */,
 				01106F8E28CAC3B100296492 /* common.h */,
 				01106F7F28CAC3B000296492 /* compiler.c */,
@@ -163,6 +168,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				01A1760028F33FDB00423414 /* table.c in Sources */,
 				01106F9128CAC3B100296492 /* scanner.c in Sources */,
 				01106F9728CAC3B100296492 /* debug.c in Sources */,
 				01106F7828CAC37100296492 /* main.c in Sources */,
