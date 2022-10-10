@@ -24,7 +24,7 @@ A Lox implementation from the book [Crafting Interpreters](https://craftinginter
 - [x] 18. Types of Values <sub><sup>October 9th, 2022</sup></sub>
 - [x] 19. Strings <sub><sup>October 9th, 2022</sup></sub>
 - [x] 20. Hash Tables <sub><sup>October 9th, 2022</sup></sub>
-- [ ] 21. Global Variables
+- [x] 21. Global Variables <sub><sup>October 10th, 2022</sup></sub>
 - [ ] 22. Local Variables
 - [ ] 23. Jumping Back and Forth
 - [ ] 24. Calls and Functions
